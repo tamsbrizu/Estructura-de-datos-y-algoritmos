@@ -1,0 +1,99 @@
+##Direccinamiento abierto
+
+##Metodos de transformacion: division, extraccion, plegado, cuadradoMedio
+
+import numpy as np
+
+class direccionamientoA:
+    __M: int
+    __tabla: np.array
+
+    def __init__ (self, m):
+        self.__M = self.primo(int(m/0.7))
+        self.__tabla = np.empty(self.__M, dtype=object)
+    
+##Primo para manejar mejor el espacio
+    def primo (self, m):
+        es_p = None
+        while es_p == None:
+            i = 2
+            while i < m and m%i != 0:
+                i += 1
+            if i == m:
+                es_p = m
+            else:
+                m += 1
+        return es_p
+    
+##Metodo para obtener el numero primo mas cercano al tamaño del arreglo
+    
+## Metodos de transformacion
+## Ejemplo: abcdef, clave[1:4], toma desde el caracter 1 (sin incluirlo) hasta 4 (sin incluirlo), es decir; "bc". Cuando utilizamos clave[..] devuelve una cadena
+    def divisiones (self, clave):
+        return clave % self.__M
+    
+## Secuencia de prueba lineal
+
+## Si manejamos claves unicas, no volvemos a insertar el mismo numero por eso es importante verificar que no se vuelva a repetir
+    def secuenciaPrueba (self, clave, pos):
+        inicio = pos
+        while self.__tabla[pos] != clave and self.__tabla[pos] is not None:
+            pos = (pos+1) % self.__M
+        if pos == inicio:
+            return None
+        else:
+            return pos
+
+
+##Operaciones de abstractas. Metodo de transformacion: divisiones
+
+    def insertar (self, clave):
+            posi = self.divisiones(clave)
+            if self.__tabla[posi] is None:
+                self.__tabla[posi] = clave
+            else:
+                pos = self.secuenciaPrueba(clave, posi)
+                if pos is not None:
+                    self.__tabla[pos] = clave
+                else:
+                    print("No hay posiciones vacias o la clave ingresa no es valida, ya que es unica.")
+
+    def buscar (self, clave):
+        posi = self.divisiones(clave)
+        if self.__tabla[posi] == clave:
+            return self.__tabla[posi]
+        else:
+            pos = self.secuenciaPrueba(clave, posi)
+            if pos is not None and self.__tabla[pos] == clave:
+                return self.__tabla[pos]
+            else:
+                return None
+           
+            
+    def recorrer (self):
+        for i in range(self.__M):
+            print(self.__tabla[i])
+
+
+tabla = direccionamientoA(10)
+
+tabla.insertar(15)
+tabla.insertar(35)
+tabla.insertar(8)
+tabla.insertar(5)
+tabla.insertar(5)
+
+tabla.recorrer()
+
+b1 = tabla.buscar(35)
+if b1 is not None:
+    print("El elemento 35 si se encuentra en la tabla.")
+else:
+    print("El elemento 35 no se encuentra en la tabla.")
+
+
+b2 = tabla.buscar(100)
+if b2 is not None:
+    print("El elemento 100 si se encuentra en la tabla.")
+else:
+    print("El elemento 100 no se encuentra en la tabla.")
