@@ -62,7 +62,8 @@ class encadenamiento:
                 self.__tabla[posi] = nuevo
                 self.__colisiones[posi] += 1
             else:
-                print("Colision maxima alcanzada.")
+                print(f"No se puede insertar {clave}: colisión máxima alcanzada en la posición {posi}.")
+
 
     def buscar (self, clave):
         posi = self.divisiones(clave)
