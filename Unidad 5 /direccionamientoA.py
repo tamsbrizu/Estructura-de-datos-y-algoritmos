@@ -39,10 +39,9 @@ class direccionamientoA:
         inicio = pos
         while self.__tabla[pos] != clave and self.__tabla[pos] is not None:
             pos = (pos+1) % self.__M
-        if pos == inicio:
-            return None
-        else:
-            return pos
+            if pos == inicio:
+                return None
+        return pos
 
 
 ##Operaciones de abstractas. Metodo de transformacion: divisiones
@@ -59,15 +58,21 @@ class direccionamientoA:
                     print("No hay posiciones vacias o la clave ingresa no es valida, ya que es unica.")
 
     def buscar (self, clave):
+        i = 1
         posi = self.divisiones(clave)
         if self.__tabla[posi] == clave:
-            return self.__tabla[posi]
+            ##return self.__tabla[posi]
+            ##print("La clave a buscar si se encuentra en la tabla")
+            print(f"La clave se encuentra en la posicion {posi + 1}")
         else:
             pos = self.secuenciaPrueba(clave, posi)
             if pos is not None and self.__tabla[pos] == clave:
-                return self.__tabla[pos]
+                ##return self.__tabla[pos]
+                ##print("La clave ingresad si se encuentra en la tabla")
+                print(f"La clave se encuentra en la posicion {posi + 1}")
             else:
-                return None
+                ##return None
+                print("La clave a buscar no se encuentra en la tabla")
            
             
     def recorrer (self):
@@ -85,15 +90,8 @@ tabla.insertar(5)
 
 tabla.recorrer()
 
-b1 = tabla.buscar(35)
-if b1 is not None:
-    print("El elemento 35 si se encuentra en la tabla.")
-else:
-    print("El elemento 35 no se encuentra en la tabla.")
+tabla.buscar(35)
+tabla.buscar(15)
+tabla.buscar(99)
 
 
-b2 = tabla.buscar(100)
-if b2 is not None:
-    print("El elemento 100 si se encuentra en la tabla.")
-else:
-    print("El elemento 100 no se encuentra en la tabla.")
