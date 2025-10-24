@@ -1,6 +1,3 @@
-##Faltan arreglos. Aun no terminado
-
-
 import numpy as np
 
 class bucket:
@@ -13,20 +10,18 @@ class bucket:
         self.__cont = 0
         self.__buck = np.empty(self.__tam, dtype=object)
 
+    def bucket_lleno (self):
+        return self.__cont == self.__tam
+
     def bucket_insertar (self, clave):
-        if self.__cont < self.__tam:
-            ### tambien puede ser if len(self.__buck) <= self.__tam:
-            self.__buck[self.__cont] = clave
-            self.__cont += 1
-            return True
-        else:
-            return False
+        self.__buck[self.__cont] = clave
+        self.__cont += 1
     
     def bucket_buscar (self, clave):
         i = 0
         ban = False
         elemento_encontrado = None
-        while not ban and i <= self.__cont:
+        while not ban and i < self.__cont:
             if self.__buck[i] == clave:
                 ban = True
                 elemento_encontrado = self.__buck[i]
@@ -34,29 +29,25 @@ class bucket:
                 i += 1
         return elemento_encontrado
     
-    def bucket_recorrer (self):
-        for i in range (self.__tam):
-            print(self.__buck[i])
+    def bucket_recorrer(self):
+        for i in range(self.__cont):
+            print(f"Posicion: {i} - Elemento: {self.__buck[i]}")
+
 
 class hash_buckets:
     __tabla: np.array
-    __tablaOverflow: np.array
     __M: int
-    __MOverflow: int
     __cantMax: int
     
     def __init__ (self, m, cantMColisiones):
         self.__cantMax = cantMColisiones
-        self.__M = self.primo(int(m/cantMColisiones))
-        self.__MOverflow = self.primo(int(self.__M * 0.2))
-        self.__tabla = np.empty(self.__M, dtype=bucket)
-        self.__tablaOverflow = np.empty(self.__MOverflow, dtype=bucket)
+        self.__M = int(m/cantMColisiones)
+        self.__tabla = np.empty (self.primo(int(self.__M * 1.2)), dtype=object)
+        
 
     def inicializar_tablas (self):
         for i in range(self.__M):
             self.__tabla[i] = bucket(self.__cantMax)
-        for i in range(self.__MOverflow):
-            self.__tablaOverflow[i] = bucket(self.__cantMax)
         
     def primo (self, m):
         es_p = None
@@ -75,45 +66,63 @@ class hash_buckets:
     
     def insertar (self, clave):
         pos = self.divisiones(clave)
-        resultado = self.__tabla[pos].bucket_insertar(clave)
-        if resultado:
-            print(f"La clave {clave} se encuentra en la tabla.")
+        if not self.__tabla[pos].bucket_lleno():
+            self.__tabla[pos].bucket_insertar(clave)
         else:
-            ban = False
-            while not ban:
-                for i in range(self.__MOverflow):
-                    if self.__tablaOverflow[i].bucket_insertar(clave):
-                        ban= True
+            pos = self.__M
+            while pos < len(self.__tabla) and self.__tabla[pos].bucket_lleno():
+                pos += 1
 
+            if pos < len(self.__tabla):
+                self.__tabla[pos].bucket_insertar(clave)
+            else:
+                print(f"No se puede insertar {clave}: todos los buckets están llenos")
 
     def buscar (self, clave):
         pos = self.divisiones(clave)
         resultado = self.__tabla[pos].bucket_buscar(clave)
         if resultado is not None:
-            print(f"La clave {resultado} se encuentra la tabla en la posicion {pos}")
+            return resultado
         else:
-            for i in range(self.__MOverflow):
-                resultado = self.__tablaOverflow[i].bucket_buscar(clave)
+            pos = self.__M
+            while pos < len(self.__tabla) and self.__tabla[pos] is not None:
+                resultado = self.__tabla[pos].bucket_buscar(clave)
                 if resultado is not None:
-                    print(f"La clave {resultado} se encuentra la tabla en la posicion {pos}")
+                    return resultado
+                pos += 1
+            return None
+            
 
     def recorrer (self):
         for i in range(self.__M):
-            print(self.__tabla[i].bucket_recorrer())
-        print("Tabla de overflow")
-        for i in range(self.__MOverflow):
-            print(self.__tablaOverflow[i].bucket_recorrer())
+            print(f"Lugar/posicion en la tabla: {i}")
+            self.__tabla[i].bucket_recorrer()
 
-tabla = hash_buckets(20, 3)
-tabla.inicializar_tablas()
+def main():
+    # Crear la tabla hash con 20 posiciones y buckets de tamaño 3
+    tabla = hash_buckets(20, 3)
+    tabla.inicializar_tablas()
 
-tabla.insertar(10)
-tabla.insertar(30)
-tabla.insertar(50)
-tabla.insertar(70)
+    # Insertar elementos
+    elementos = [10, 30, 50, 70, 15, 25, 35, 45, 55]
+    print("Insertando elementos:")
+    for e in elementos:
+        print(f"Inserto: {e}")
+        tabla.insertar(e)
 
-tabla.recorrer()
+    print("\nRecorrido de la tabla hash:")
+    tabla.recorrer()  # Imprime todos los elementos en los buckets
 
-tabla.buscar(30)
-tabla.buscar(99)
+    # Buscar elementos existentes
+    busquedas = [30, 55, 99]  # 99 no existe
+    print("\nResultados de búsqueda:")
+    for b in busquedas:
+        res = tabla.buscar(b)
+        if res is not None:
+            print(f"Elemento {b} encontrado en la tabla.")
+        else:
+            print(f"Elemento {b} NO encontrado en la tabla.")
+
+if __name__ == "__main__":
+    main()
 
