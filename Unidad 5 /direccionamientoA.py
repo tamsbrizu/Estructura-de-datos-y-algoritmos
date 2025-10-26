@@ -3,13 +3,14 @@
 ##Metodos de transformacion: division, extraccion, plegado, cuadradoMedio
 
 import numpy as np
+import math
 
 class direccionamientoA:
     __M: int
     __tabla: np.array
 
     def __init__ (self, m):
-        self.__M = self.primo(int(m/0.7))
+        self.__M = self.primo(round(m/0.7))
         self.__tabla = np.empty(self.__M, dtype=object)
     
 ##Primo para manejar mejor el espacio
@@ -58,21 +59,20 @@ class direccionamientoA:
                     print("No hay posiciones vacias o la clave ingresa no es valida, ya que es unica.")
 
     def buscar (self, clave):
-        i = 1
         posi = self.divisiones(clave)
         if self.__tabla[posi] == clave:
-            ##return self.__tabla[posi]
+            return self.__tabla[posi]
             ##print("La clave a buscar si se encuentra en la tabla")
-            print(f"La clave se encuentra en la posicion {posi + 1}")
+           ## print(f"La clave se encuentra en la posicion {posi + 1}")
         else:
-            pos = self.secuenciaPrueba(clave, posi)
-            if pos is not None and self.__tabla[pos] == clave:
-                ##return self.__tabla[pos]
+            posi = self.secuenciaPrueba(clave, posi)
+            if posi is not None and self.__tabla[posi] == clave:
+                return self.__tabla[posi]
                 ##print("La clave ingresad si se encuentra en la tabla")
-                print(f"La clave se encuentra en la posicion {posi + 1}")
+                ##print(f"La clave se encuentra en la posicion {posi + 1}")
             else:
-                ##return None
-                print("La clave a buscar no se encuentra en la tabla")
+                return None
+                ##print("La clave a buscar no se encuentra en la tabla")
            
             
     def recorrer (self):
