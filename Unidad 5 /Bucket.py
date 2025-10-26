@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 class bucket:
     __tam: int
@@ -37,12 +38,14 @@ class bucket:
 class hash_buckets:
     __tabla: np.array
     __M: int
+    __A: int
     __cantMax: int
     
     def __init__ (self, m, cantMColisiones):
         self.__cantMax = cantMColisiones
-        self.__M = int(m/cantMColisiones)
-        self.__tabla = np.empty (self.primo(int(self.__M * 1.2)), dtype=object)
+        self.__A = round(m/cantMColisiones)
+        self.__M = round(self.__A * 1.2)
+        self.__tabla = np.empty (self.primo(self.__M), dtype=object)
         
 
     def inicializar_tablas (self):
@@ -62,18 +65,18 @@ class hash_buckets:
         return es_p
     
     def divisiones (self, clave):
-        return clave % self.__M
+        return clave % self.__A
     
     def insertar (self, clave):
         pos = self.divisiones(clave)
         if not self.__tabla[pos].bucket_lleno():
             self.__tabla[pos].bucket_insertar(clave)
         else:
-            pos = self.__M
-            while pos < len(self.__tabla) and self.__tabla[pos].bucket_lleno():
+            pos = self.__A
+            while pos < self.__M and self.__tabla[pos].bucket_lleno():
                 pos += 1
 
-            if pos < len(self.__tabla):
+            if pos < self.__M:
                 self.__tabla[pos].bucket_insertar(clave)
             else:
                 print(f"No se puede insertar {clave}: todos los buckets están llenos")
@@ -84,8 +87,8 @@ class hash_buckets:
         if resultado is not None:
             return resultado
         else:
-            pos = self.__M
-            while pos < len(self.__tabla) and self.__tabla[pos] is not None:
+            pos = self.__A
+            while pos < self.__M and self.__tabla[pos] is not None:
                 resultado = self.__tabla[pos].bucket_buscar(clave)
                 if resultado is not None:
                     return resultado
@@ -125,4 +128,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
 
