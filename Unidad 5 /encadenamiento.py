@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 class Nodo:
     __elemento: None
@@ -20,14 +21,12 @@ class Nodo:
 class encadenamiento:
     __M: int
     __tabla: np.array
-    __colisiones: np.array ##Arreglo de colsiones de contadores para llevar la cantidad de colisiones que tiene cada posicion
     __tamC: int ## Cantidad de colisiones maximas que puede tener cada posicion en la tabla
 
     def __init__ (self, m):
         self.__tamC = 4
-        self.__M = self.primo(int(m/self.__tamC))
+        self.__M = self.primo(math.ceil(m/self.__tamC))
         self.__tabla = np.empty (self.__M, dtype=object)
-        self.__colisiones = np.zeros(self.__M, dtype=int)
 
 ##Primo para manejar mejor el espacio
     def primo (self, m):
@@ -55,15 +54,10 @@ class encadenamiento:
         if self.__tabla[posi] is None:
             self.__tabla[posi] = nuevo
         else:
-            if self.__colisiones[posi] < self.__tamC:
             ## Forma constante de insercion, cada vez que va ingresando una nueva clave, se convierte en la cabeza del arreglo y apunta al que estaba antes, y el primero
             ## que se inserto se convierte en el ultimo nodo
                 nuevo.set_sig(self.__tabla[posi])
                 self.__tabla[posi] = nuevo
-                self.__colisiones[posi] += 1
-            else:
-                print(f"No se puede insertar {clave}: colisión máxima alcanzada en la posición {posi}.")
-
 
     def buscar (self, clave):
         posi = self.divisiones(clave)
@@ -112,5 +106,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
