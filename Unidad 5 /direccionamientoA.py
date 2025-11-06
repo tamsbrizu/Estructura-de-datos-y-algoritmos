@@ -10,7 +10,7 @@ class direccionamientoA:
     __tabla: np.array
 
     def __init__ (self, m):
-        self.__M = self.primo(round(m/0.7))
+        self.__M = self.primo(math.ceil(m/0.7))
         self.__tabla = np.empty(self.__M, dtype=object)
     
 ##Primo para manejar mejor el espacio
@@ -93,5 +93,6 @@ tabla.recorrer()
 tabla.buscar(35)
 tabla.buscar(15)
 tabla.buscar(99)
+
 
 
