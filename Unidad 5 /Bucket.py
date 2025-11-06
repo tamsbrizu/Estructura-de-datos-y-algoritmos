@@ -3,26 +3,23 @@ import math
 
 class bucket:
     __tam: int
-    __cont: int
     __buck: np.array
 
     def __init__(self, t):
         self.__tam = t
-        self.__cont = 0
         self.__buck = np.empty(self.__tam, dtype=object)
 
-    def bucket_lleno (self):
-        return self.__cont == self.__tam
+    def bucket_lleno (self, cant):
+        return cant == self.__tam
 
-    def bucket_insertar (self, clave):
-        self.__buck[self.__cont] = clave
-        self.__cont += 1
+    def bucket_insertar (self, clave, cant):
+        self.__buck[cant] = clave
     
     def bucket_buscar (self, clave):
         i = 0
         ban = False
         elemento_encontrado = None
-        while not ban and i < self.__cont:
+        while not ban and i < self.__tam:
             if self.__buck[i] == clave:
                 ban = True
                 elemento_encontrado = self.__buck[i]
@@ -31,8 +28,9 @@ class bucket:
         return elemento_encontrado
     
     def bucket_recorrer(self):
-        for i in range(self.__cont):
-            print(f"Posicion: {i} - Elemento: {self.__buck[i]}")
+        for i in range(self.__tam):
+            if self.__buck[i] is not None:
+                print(f"Posicion: {i} - Elemento: {self.__buck[i]}")
 
 
 class hash_buckets:
@@ -40,12 +38,26 @@ class hash_buckets:
     __M: int
     __A: int
     __cantMax: int
+    __contadores: np.array
     
     def __init__ (self, m, cantMColisiones):
         self.__cantMax = cantMColisiones
-        self.__A = round(m/cantMColisiones)
-        self.__M = round(self.__A * 1.2)
+        self.__A = self.primo(math.ceil(m/cantMColisiones))
+        self.__M = math.ceil(self.__A * 1.2)
         self.__tabla = np.empty (self.primo(self.__M), dtype=object)
+        self.__contadores = np.zeros(self.__M, dtype = int)
+
+    def primo (self, m):
+        es_primo = None
+        while es_primo is None:
+            i = 2
+            while i < m and m % i != 0:
+                i+=1
+            if i == m:
+                es_primo = m
+            else:
+                m += 1
+        return m
         
 
     def inicializar_tablas (self):
@@ -69,15 +81,17 @@ class hash_buckets:
     
     def insertar (self, clave):
         pos = self.divisiones(clave)
-        if not self.__tabla[pos].bucket_lleno():
-            self.__tabla[pos].bucket_insertar(clave)
+        if not self.__tabla[pos].bucket_lleno(self.__contadores[pos]):
+            self.__tabla[pos].bucket_insertar(clave, self.__contadores[pos])
+            self.__contadores[pos] += 1
         else:
             pos = self.__A
-            while pos < self.__M and self.__tabla[pos].bucket_lleno():
+            while pos < self.__M and self.__tabla[pos].bucket_lleno(self.__contadores[pos]):
                 pos += 1
 
             if pos < self.__M:
-                self.__tabla[pos].bucket_insertar(clave)
+                self.__tabla[pos].bucket_insertar(clave, self.__contadores[pos])
+                self.__contadores[pos] += 1
             else:
                 print(f"No se puede insertar {clave}: todos los buckets están llenos")
 
@@ -117,7 +131,7 @@ def main():
     tabla.recorrer()  # Imprime todos los elementos en los buckets
 
     # Buscar elementos existentes
-    busquedas = [30, 55, 99]  # 99 no existe
+    busquedas = [30, 55, 99, 1000]  # 99 no existe
     print("\nResultados de búsqueda:")
     for b in busquedas:
         res = tabla.buscar(b)
@@ -128,5 +142,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-
 
